@@ -113,12 +113,12 @@ def app():
         st.header('Paso 3. Indica a continuación a que tipo de sensor y lado corresponde cada columna de la que quieras extraer variables')
         st.markdown('Introduce el valor numérico al que pertenece tu columna, siendo la primera 0. Separa los elementos por "," siguiendo el ejemplo de los valores que aparecen por defecto.')
 
-        fs, cols = st.beta_columns(2)
+        #fs, cols = st.beta_columns(2)
         #emg_fs = fs.selectbox('What´s the sampling frequency of your sEMG sensor', options= [250,512,1024,2048], index = 2)
         #imu_fs = fs.selectbox('What´s the sampling frequency of your IMU sensor', options= [250,512,1024,2048], index = 2)
-        emg_cols = cols.text_input('¿Qué columnas pertenecen a los sensores de electromiografía?', '30,31,32,33,34,35,36,37,38,39,40,41,42,43')
-        imu_cols = cols.text_input('¿Qué columnas pertenecen a los sensores inerciales?', '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29')
-        gy = cols.text_input('¿Qué columna pertene al componente X de la cintura?', '29')
+        emg_cols = text_input('¿Qué columnas pertenecen a los sensores de electromiografía?', '30,31,32,33,34,35,36,37,38,39,40,41,42,43')
+        imu_cols = text_input('¿Qué columnas pertenecen a los sensores inerciales?', '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29')
+        gy = text_input('¿Qué columna pertene al componente X de la cintura?', '29')
 
         submit_button = st.form_submit_button(label='Submit')
 

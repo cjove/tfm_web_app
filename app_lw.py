@@ -116,7 +116,7 @@ def app():
         gy1 = fs.text_input('¿Qué columna corresponde al componente Y del giróscopo de la tibia? Derecho primero', '3,15')
         r_labels = fs.text_input('¿Qué columnas pertenecen a los sensores inerciales del lado derecho?', '0,1,2,4,5,6,7,8,9,10,11')
         l_labels = fs.text_input('¿Qué columnas pertenecen a los sensores inerciales del lado izquierdo y/o cintura? ','12,13,14,16,17,18,19,20,21,22,23,24,25,26,27,28,29')
-        r_labels_emg = fs.text_input('¿Qué columnas pertenecen a los músculos del lado derecho?', '30,31,32,33,34,35,36')
+        r_labels_emg = cols.text_input('¿Qué columnas pertenecen a los músculos del lado derecho?', '30,31,32,33,34,35,36')
         l_labels_emg = cols.text_input('¿Qué columnas pertenecen a los músculos del lado izquierdo?','37,38,39,40,41,42,43')
         mode = cols.text_input('¿Qué columna pertenece al modo?','48')
         #emg_fs = cols.selectbox('What´s the sampling frequency of your sEMG sensor', options= [250,512,1024,2048], index = 2)
