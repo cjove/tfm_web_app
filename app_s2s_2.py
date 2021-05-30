@@ -59,7 +59,7 @@ def app():
 
     with header:
         st.title('Extracción de variables durante la transición de sedestación a bipedestación')
-        st.text('Escoge aquellas variables que sean de tu interés e indica a que hemicuerpo y tipo de sensor corresponden las columnas de tu matriz de datos. Es fundamental que indiques correctamente que columna corresponde al componente X del giróscopo de la cintura')
+        st.markdown('Escoge aquellas variables que sean de tu interés e indica a que hemicuerpo y tipo de sensor corresponden las columnas de tu matriz de datos. Es fundamental que indiques correctamente que columna corresponde al componente X del giróscopo de la cintura')
         st.markdown('Esta aplicación asume que se han realizado registros bilaterales y que al menos se han recogido el componente X del giróscopo de la cintura y algun músculos bilateralmente para poder ser utilizada. También asume que el primer movimiento registrado es la transición y que no existe en el registro movimientos con mayor velocidad angular de la cintura')
         st.markdown("""
         El procedimiento interno de la aplicación es:
