@@ -144,8 +144,8 @@ def app():
                     pdList_l = [w,lmg,lst]
                     results_r = pd.concat(pdList_r,axis = 1)
                     results_l = pd.concat(pdList_l,axis = 1)
-                    st.write(results_r)
-                    st.write(results_l)
+                    #st.write(results_r)
+                    #st.write(results_l)
                     results_r = results_r.values
                     results_l = results_l.values
 
