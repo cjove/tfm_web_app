@@ -72,7 +72,7 @@ def app():
     with dataset:
         st.header('Paso 1.')
         uploaded_file =st.file_uploader('Introduce aquí tu matriz de datos', type = ['csv'],
-                         accept_multiple_files=True)
+                         accept_multiple_files=False)
         if uploaded_file is not None:
             dataframes = []
             for i in uploaded_file:

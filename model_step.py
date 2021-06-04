@@ -19,7 +19,7 @@ from typing import Dict
 
 
 def app():
-    pickle_in = open('multioutput_regression_step.pkl', 'rb')
+    pickle_in = open('multioutput_regression_step_def.pkl', 'rb')
     regressor = pickle.load(pickle_in)
 
     header = st.beta_container()
@@ -59,15 +59,15 @@ def app():
 
     with header:
         st.title('Predicción de la actividad neuromuscular durante la marcha en superficie plana ')
-        st.markdown('En esta sección de la aplicación, introduciendo en el formulario las columnas provenientes de: X,Y,Z, podrás predecir la actividad muscular de los siguientes 5 músculos: 1,2,3,4,5')
-        st.markdown('El algoritmo utilizado es:           con los siguientes parámetros:    ')
+        st.markdown('En esta sección de la aplicación, introduciendo en el formulario las columnas provenientes del componente X del giróscopo ubicado en la tibia, la actividad electromiográfica de los tibiales anteriores y de los vastos laterales podrás predecir la actividad muscular (RMS o media cuadrática) de los siguientes 5 músculos: gemelo interno (GI), sóleo (SOL), bíceps femoral (BF), semitendinoso (ST) y recto femoral (RF) de ambas piernas')
+        st.markdown('El algoritmo utilizado es Árboles Extra con los siguientes parámetros: bootstrap = False, criterion = mse, max_depth = 90, min_samples_leaf = 1, min_samples_split = 5, n_estimators = 250')
         st.markdown('Para poder utilizar correctamente la aplicación es necesaria tener una columna en la matriz de datos que indique el movimiento que se esta relizando (columna "Modo").La columna modo es necesaria para garantizar que si se han realizado otras actividades distintas a la marcha en el registro introducido se discriminan los pasos correctamente. Para ello crea una columna con nombre "mode" y rellena con 1´s cada punto de la señal que correspoda a la marcha en superficie plana. Si todo el registro es de marcha en plano, rellena la columna de 1´s en su totalidad')
 
     with dataset:
 
         st.header('Paso 1.')
         uploaded_file =st.file_uploader('Introduce aquí tu matriz de datos', type = ['csv'],
-                         accept_multiple_files=True)
+                         accept_multiple_files=False)
         if uploaded_file is not None:
             dataframes = []
             for i in uploaded_file:
@@ -80,12 +80,12 @@ def app():
         st.markdown('Recuerda: este modelo requiere que hayas recogido información de sensores inerciales en las tibias y .....')
         r_shank_gy = st.text_input('¿Qué columna corresponde con el componente Y del giróscopo en la tibia derecha?', '3')
         l_shank_gy = st.text_input('¿Qué columna corresponde con el componente Y del giróscopo en la tibia izquierda?', '15')
-        r_shank_rest = st.text_input('¿Qué columnas corresponden con el resto de componentes del sensor inercial en la tibia derecha?', '0,1,2,4,5')
-        l_shank_rest = st.text_input('¿Qué columnas corresponden con el resto de componentes del sensor inercial en la tibia izquierda?', '12,13,14,16,17')
-        right_MG = st.text_input('¿Qué columna corresponde con el gemelo medial de la pierna derecha?','31')
-        left_MG = st.text_input('¿Qué columna corresponde con el gemelo medial de la pierna izquierda?', '38')
-        right_SOL = st.text_input('¿Qué columna corresponde con el sóleo de la pierna derecha?', '32')
-        left_SOL = st.text_input('¿Qué columna corresponde con el soleo de la pierna izquierda?', '39')
+        #r_shank_rest = st.text_input('¿Qué columnas corresponden con el resto de componentes del sensor inercial en la tibia derecha?', '0,1,2,4,5')
+        #l_shank_rest = st.text_input('¿Qué columnas corresponden con el resto de componentes del sensor inercial en la tibia izquierda?', '12,13,14,16,17')
+        right_TA = st.text_input('¿Qué columna corresponde con el tibial anterior de la pierna derecha?','31')
+        left_TA = st.text_input('¿Qué columna corresponde con el tibial anterior de la pierna izquierda?', '38')
+        right_VL = st.text_input('¿Qué columna corresponde con el vasto lateral de la pierna derecha?', '32')
+        left_VL = st.text_input('¿Qué columna corresponde con el vasto lateral de la pierna izquierda?', '39')
         mode = st.text_input('¿Que columna corresponde al modo?', '48')
         submit_button_model = st.form_submit_button(label='Submit')
 
@@ -96,25 +96,25 @@ def app():
                     #list_emg_freq = {'mdf':mdf,'mf':mnf,'she':se,'spe':spe,'svde':svde}
                     #list_imu = {'min':min_imu, 'max': max_imu,'std':std_imu, 'fin':final_imu, 'ini':init_imu,'mean': mean_imu}
 
-                    r_imu_list = r_shank_rest.split(',')
-                    r_imu_list = [int(i) for i in r_imu_list]
+                    #r_imu_list = r_shank_rest.split(',')
+                    #r_imu_list = [int(i) for i in r_imu_list]
 
-                    l_imu_list = l_shank_rest.split(',')
-                    l_imu_list = [int(i) for i in l_imu_list]
+                    #l_imu_list = l_shank_rest.split(',')
+                    #l_imu_list = [int(i) for i in l_imu_list]
                     #emg_list = [int(i) for i in emg_list]
                     mode = int(mode)
                     r_gy = int(r_shank_gy)
                     l_gy = int(l_shank_gy)
-                    right_MG = int(right_MG)
-                    left_MG = int(left_MG)
-                    right_SOL = int(right_SOL)
-                    left_SOL = int(left_SOL)
-                    imu_list = [r_gy] + r_imu_list + [l_gy] + l_imu_list
-                    r_lab = [r_gy] + r_imu_list
-                    l_lab = [l_gy] + l_imu_list
-                    r_lab_emg = [right_MG , right_SOL]
-                    l_lab_emg = [left_MG , left_SOL]
-                    emg_list= [right_MG , left_MG , right_SOL, left_SOL]
+                    right_TA = int(right_TA)
+                    left_TA = int(left_TA)
+                    right_VL = int(right_VL)
+                    left_VL = int(left_VL)
+                    imu_list = [r_gy , l_gy]
+                    r_lab = [r_gy]
+                    l_lab = [l_gy]
+                    r_lab_emg = [right_TA , right_VL]
+                    l_lab_emg = [left_TA , left_VL]
+                    emg_list= [right_TA , left_TA , right_VL, left_VL]
                 #name = pd.read_csv(df[0])
                     names = dataframes[0].columns
                     names_series = pd.Series(names)
@@ -135,6 +135,7 @@ def app():
                     #gy = int(gy)
                     mode_lw = names[mode]
                     r_gy_ = names[r_gy]
+                    st.write(r_gy_)
                     l_gy_ = names[l_gy]
                     data = de.data_extraction_step(dataframes,names, emg_list, imu_list, mode_lw )
                     emg_filt = data[0]
@@ -142,7 +143,7 @@ def app():
                     acc_names = data[2]
                     muscle_names = data[3]
                     index_steps = data[4]
-                    #st.write(muscle_names)
+                    st.write(acc_names)
                     lab_imu = dgs.create_labels_imu(acc_names, featurename_imu)
                     lab_emg = dgs.create_labels_emg(muscle_names, featurename_emg)
                     lab_emg_d = dgs.create_labels_emg(n_emg_d, featurename_emg)
@@ -162,59 +163,26 @@ def app():
                     r_shank = results.loc[:,results.columns.str.startswith(r_gy_)]
                     r_shank = r_shank.reindex(sorted(r_shank), axis = 1)
 
-                    r_shank_1 = results.loc[:,results.columns.str.startswith(names[r_imu_list[0]])]
-                    r_shank_1 = r_shank_1.reindex(sorted(r_shank_1), axis = 1)
-
-                    r_shank_2 = results.loc[:,results.columns.str.startswith(names[r_imu_list[1]])]
-                    r_shank_2 = r_shank_2.reindex(sorted(r_shank_2), axis = 1)
-
-                    r_shank_3 = results.loc[:,results.columns.str.startswith(names[r_imu_list[2]])]
-                    r_shank_3 = r_shank_3.reindex(sorted(r_shank_3), axis = 1)
-
-                    r_shank_4 = results.loc[:,results.columns.str.startswith(names[r_imu_list[3]])]
-                    r_shank_4 = r_shank_4.reindex(sorted(r_shank_4), axis = 1)
-                    #st.write(r_shank_4)
-                    r_shank_5 = results.loc[:,results.columns.str.startswith(names[r_imu_list[4]])]
-                    r_shank_5 = r_shank_5.reindex(sorted(r_shank_5), axis = 1)
-
                     l_shank = results.loc[:,results.columns.str.startswith(l_gy_)]
                     l_shank = l_shank.reindex(sorted(l_shank), axis = 1)
 
-                    l_shank_1 = results.loc[:,results.columns.str.startswith(names[l_imu_list[0]])]
-                    l_shank_1 = l_shank_1.reindex(sorted(l_shank_1), axis = 1)
 
-                    l_shank_2 = results.loc[:,results.columns.str.startswith(names[l_imu_list[1]])]
-                    l_shank_2 = l_shank_2.reindex(sorted(l_shank_2), axis = 1)
+                    rta = results.loc[:,results.columns.str.startswith(names[right_TA])]
+                    rta = rta.reindex(sorted(rta), axis = 1)
 
-                    l_shank_3 = results.loc[:,results.columns.str.startswith(names[l_imu_list[2]])]
-                    l_shank_3 = l_shank_3.reindex(sorted(l_shank_3), axis = 1)
+                    lta = results.loc[:,results.columns.str.startswith(names[left_TA])]
+                    lta = lta.reindex(sorted(lta), axis = 1)
 
-                    l_shank_4 = results.loc[:,results.columns.str.startswith(names[l_imu_list[3]])]
-                    l_shank_4 = l_shank_4.reindex(sorted(l_shank_4), axis = 1)
+                    rvl = results.loc[:,results.columns.str.startswith(names[right_VL])]
+                    rvl = rvl.reindex(sorted(rvl), axis = 1)
 
-                    l_shank_5 = results.loc[:,results.columns.str.startswith(names[l_imu_list[4]])]
-                    l_shank_5 = l_shank_5.reindex(sorted(l_shank_5), axis = 1)
-
-
-
-
-                    rmg = results.loc[:,results.columns.str.startswith(names[right_MG])]
-                    rmg = rmg.reindex(sorted(rmg), axis = 1)
-
-                    lmg = results.loc[:,results.columns.str.startswith(names[left_MG])]
-                    lmg = lmg.reindex(sorted(lmg), axis = 1)
-
-                    rsol = results.loc[:,results.columns.str.startswith(names[right_SOL])]
-                    rsol = rsol.reindex(sorted(rsol), axis = 1)
-                    #st.write(rsol.head())
-
-                    lsol = results.loc[:,results.columns.str.startswith(names[left_SOL])]
-                    lsol = lsol.reindex(sorted(lsol), axis = 1)
+                    lvl = results.loc[:,results.columns.str.startswith(names[left_VL])]
+                    lvl = lvl.reindex(sorted(lvl), axis = 1)
                     #st.write(lsol.head())
 
 
-                    pdList_r = [r_shank,r_shank_1,r_shank_2,r_shank_3,r_shank_4,r_shank_5, rmg, rsol]
-                    pdList_l = [l_shank,l_shank_1,l_shank_2,l_shank_3,l_shank_4,l_shank_5, lmg, lsol]
+                    pdList_r = [r_shank, rta, rvl]
+                    pdList_l = [l_shank, lta, lvl]
 
                     results_r = pd.concat(pdList_r,axis = 1)
                     results_l = pd.concat(pdList_l,axis = 1)
@@ -239,9 +207,9 @@ def app():
                     length_l = np.arange(0,len(results_l), 1)
                     pred_l = aplicar_modelo(results_l, length_l)
 
-                    predict_df_r = pd.DataFrame(np.concatenate(pred_r), columns = ['Right_TA_rms','Right_BF_rms', 'Right_ST_rms', 'Right_VL_rms', 'Right_RF_rms'])
+                    predict_df_r = pd.DataFrame(np.concatenate(pred_r), columns = ['Derecho_GI_rms','Derecho_SOL_rms', 'Derecho_BF_rms', 'Derecho_ST_rms', 'Derecho_RF_rms'])
 
-                    predict_df_l = pd.DataFrame(np.concatenate(pred_l), columns = ['Left_TA_rms','Left_BF_rms', 'Left_ST_rms', 'Left_VL_rms', 'Left_RF_rms'])
+                    predict_df_l = pd.DataFrame(np.concatenate(pred_l), columns = ['Izquierdo_GI_rms','Izquierdo_SOL_rms', 'Izquierdo_BF_rms', 'Izquierdo_ST_rms', 'Izquierdo_RF_rms'])
 
                     st.markdown('La predicción de la actividad muscular del lado derecho')
                     st.write(predict_df_r)

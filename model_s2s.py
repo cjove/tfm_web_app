@@ -16,7 +16,7 @@ import numpy as np
 import pickle
 
 def app():
-    pickle_in = open('multioutput_regression_s2s_2.pkl', 'rb')
+    pickle_in = open('multioutput_regression_s2s_def.pkl', 'rb')
     regressor = pickle.load(pickle_in)
 
     def aplicar_modelo(data, length):
@@ -57,16 +57,16 @@ def app():
 
     with header:
         st.title("Predicción de la actividad neuromuscular durante la transición de sedestación a bipedestación ")
-        st.markdown('En esta sección de la aplicación, introduciendo en el formulario las columnas provenientes de: X,Y,Z, podrás predecir la actividad muscular de los siguientes 5 músculos: 1,2,3,4,5')
-        st.markdown('El algoritmo utilizado es:           con los siguientes parámetros:    ')
-        st.markdown('Esta aplicación asume que se han realizado registros bilaterales y que al menos se han recogido el componente X del giróscopo de la cintura y algun músculos bilateralmente para poder ser utilizada. También asume que el primer movimiento registrado es la transición y que no existe en el registro movimientos con mayor velocidad angular de la cintura')
+        st.markdown('En esta sección de la aplicación, introduciendo en el formulario las columnas provenientes del componente Z del acelerómetro de la cadera, el componente X del giróscopo de la cadera y la actividad electromiográfica del tibial anterior y del bíceps femoral podrás predecir la actividad muscular (RMS o media cuadrática) de los siguientes 5 músculos: gemelo interno (GI), sóleo (SOL), semitendinoso (ST), vasto lateral (VL) y recto femoral (RF) durante la transición de sedestación a bipedestación de ambas piernas')
+        st.markdown('El algoritmo utilizado es Árboles Extra con los siguientes parámetros: bootstrap = False, criterion = mae, max_depth = 10, min_samples_leaf = 1, min_samples_split = 5, n_estimators = 300')
+        st.markdown('Esta aplicación asume que se han realizado registros bilaterales y que el primer movimiento registrado es la transición y que no existe en el registro movimientos con mayor velocidad angular de la cintura')
 
 
     with dataset:
 
         st.header('Paso 1.')
         uploaded_file =st.file_uploader('Introduce aquí tu matriz de datos', type = ['csv'],
-                         accept_multiple_files=True)
+                         accept_multiple_files=False)
         if uploaded_file is not None:
             dataframes = []
             for i in uploaded_file:
@@ -80,11 +80,11 @@ def app():
         st.markdown('Recuerda: este modelo requiere que hayas recogido información de un sensor inercial en la cintura y .....')
 
         waist = st.text_input('¿Qué columna corresponde con el componente X del giróscopo en la cintura', '29')
-        waist_rest = st.text_input('¿Qué columnas corresponden con el resto de componentes del sensor inercial en la cintura', '24,25,26,27,28')
-        right_TA = st.text_input('¿Qué columna corresponde con el registro del tibal anterior derecho?Which columns of your dataset correspond to   the Right_TA emg?', '30')
+        waist_az = st.text_input('¿Qué columna corresponde con el componente Z del acelerómetro en la cintura', '26')
+        right_TA = st.text_input('¿Qué columna corresponde con el registro del tibal anterior derecho?', '30')
         left_TA = st.text_input('¿Qué columna corresponde con el registro del tibal anterior izquierdo?', '37')
-        left_MG = st.text_input('¿Qué columna corresponde con el registro del gemelo medial izquierdo?', '38')
-        left_ST = st.text_input('¿Qué columna corresponde con el registro del semitendinoso izquierdo?', '41')
+        right_BF = st.text_input('¿Qué columna corresponde con el registro del bíceps femoral derecho?', '33')
+        left_BF = st.text_input('¿Qué columna corresponde con el registro del bíceps femoral izquierdo?', '40')
 
         submit_button_model = st.form_submit_button(label='Submit')
 
@@ -94,17 +94,18 @@ def app():
                     #list_emg_time = {'wa':wa,'var':var,'rms':rms,'mav':mav,'wfl':wfl,'zc':zc,'ssc':ssc, 'ssi':ssi }
                     #list_emg_freq = {'mdf':mdf,'mf':mnf,'she':se,'spe':spe,'svde':svde}
                     #list_imu = {'min':min_imu, 'max': max_imu,'std':std_imu, 'fin':final_imu, 'ini':init_imu,'mean': mean_imu}
-                    imu_list = waist_rest.split(',')
+                    #imu_list = waist_rest.split(',')
                     #emg_list = emg_cols.split(',')
-                    imu_list = [int(i) for i in imu_list]
+                    #imu_list = [int(i) for i in imu_list]
                     #emg_list = [int(i) for i in emg_list]
                     waist = int(waist)
+                    waist_az = int(waist_az)
                     right_TA = int(right_TA)
                     left_TA = int(left_TA)
-                    left_MG = int(left_MG)
-                    left_ST = int(left_ST)
-                    imu_list.append(waist)
-                    emg_list= [right_TA, left_TA, left_MG, left_ST]
+                    right_BF = int(right_BF)
+                    left_BF = int(left_BF)
+                    imu_list = [waist_az, waist]
+                    emg_list= [right_TA, left_TA, right_BF, left_BF]
                 #name = pd.read_csv(df[0])
                     names = dataframes[0].columns
                 #gy = names[gy]
@@ -134,14 +135,25 @@ def app():
                     emg_s2s_dataframe = dgs2s.create_dataframe_s2s(emg_features_s2s, lab_emg, 1) #,num_var = [len(imu_list),len(emg_list)]
                     results = pd.concat([imu_s2s_dataframe,emg_s2s_dataframe],axis = 1)
                     #st.write(results.head())
-                    w = results.loc[:,results.columns.str.startswith(names[waist][:4])]
-                    rta = results.loc[:,results.columns.str.startswith(names[right_TA])]
-                    lta = results.loc[:,results.columns.str.startswith(names[left_TA])]
-                    lmg = results.loc[:,results.columns.str.startswith(names[left_MG])]
-                    lst = results.loc[:,results.columns.str.startswith(names[left_ST])]
+                    waz_mean = results.loc[:,results.columns.str.startswith(str(names[waist_az])+'_mean')]
+                    wgx_std = results.loc[:,results.columns.str.startswith(str(names[waist])+'_std')]
+                    rta_ssc = results.loc[:,results.columns.str.startswith(str(names[right_TA])+'_ssc')]
+                    rta_svde = results.loc[:,results.columns.str.startswith(str(names[right_TA])+'_svde')]
+                    lta_ssc = results.loc[:,results.columns.str.startswith(str(names[left_TA])+'_ssc')]
+                    lta_svde = results.loc[:,results.columns.str.startswith(str(names[left_TA])+'_svde')]
+                    rbf_mav = results.loc[:,results.columns.str.startswith(str(names[right_BF])+'_mav')]
+                    rbf_rms = results.loc[:,results.columns.str.startswith(str(names[right_BF])+'_rms')]
+                    rbf_ssi = results.loc[:,results.columns.str.startswith(str(names[right_BF])+'_ssi')]
+                    rbf_svde = results.loc[:,results.columns.str.startswith(str(names[right_BF])+'_svde')]
+                    rbf_wfl = results.loc[:,results.columns.str.startswith(str(names[right_BF])+'_wfl')]
+                    lbf_mav = results.loc[:,results.columns.str.startswith(str(names[left_BF])+'_mav')]
+                    lbf_rms = results.loc[:,results.columns.str.startswith(str(names[left_BF])+'_rms')]
+                    lbf_ssi = results.loc[:,results.columns.str.startswith(str(names[left_BF])+'_ssi')]
+                    lbf_svde = results.loc[:,results.columns.str.startswith(str(names[left_BF])+'_svde')]
+                    lbf_wfl = results.loc[:,results.columns.str.startswith(str(names[left_BF])+'_wfl')]
 
-                    pdList_r = [w,rta,lta]
-                    pdList_l = [w,lmg,lst]
+                    pdList_r = [waz_mean,wgx_std,rta_ssc,rta_svde,rbf_mav,rbf_rms,rbf_ssi,rbf_svde,rbf_wfl]
+                    pdList_l = [waz_mean,wgx_std,lta_ssc,lta_svde,lbf_mav,lbf_rms,lbf_ssi,lbf_svde,lbf_wfl]
                     results_r = pd.concat(pdList_r,axis = 1)
                     results_l = pd.concat(pdList_l,axis = 1)
                     #st.write(results_r)
@@ -159,9 +171,9 @@ def app():
                     length_l = np.arange(0,len(results_l), 1)
                     pred_l = aplicar_modelo(results_l, length_l)
 
-                    predict_df_r = pd.DataFrame(np.concatenate(pred_r), columns = ['Right_TA_rms','Right_BF_rms', 'Right_ST_rms', 'Right_VL_rms', 'Right_RF_rms'])
+                    predict_df_r = pd.DataFrame(np.concatenate(pred_r), columns = ['Derecho_GI_rms','Derecho_SOL_rms', 'Derecho_ST_rms', 'Derecho_VL_rms', 'Derecho_RF_rms'])
 
-                    predict_df_l = pd.DataFrame(np.concatenate(pred_l), columns = ['Left_TA_rms','Left_BF_rms', 'Left_ST_rms', 'Left_VL_rms', 'Left_RF_rms'])
+                    predict_df_l = pd.DataFrame(np.concatenate(pred_l), columns = ['Izquierdo_GI_rms','Izquierdo_SOL_rms', 'Izquierdo_ST_rms', 'Izquierdo_VL_rms', 'Izquierdo_RF_rms'])
 
                     st.markdown('La predicción de la actividad muscular del lado derecho')
                     st.write(predict_df_r)
