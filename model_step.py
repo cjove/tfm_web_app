@@ -24,8 +24,6 @@ def app():
 
     header = st.beta_container()
     dataset = st.beta_container()
-    #form = st.form(key='my_form2')
-    #processed = st.beta_container()
     model_application = st.form(key='second_step')
 
     def aplicar_modelo(data, length):
@@ -80,8 +78,6 @@ def app():
         st.markdown('Recuerda: este modelo requiere que hayas recogido información de sensores inerciales en las tibias y .....')
         r_shank_gy = st.text_input('¿Qué columna corresponde con el componente Y del giróscopo en la tibia derecha?', '3')
         l_shank_gy = st.text_input('¿Qué columna corresponde con el componente Y del giróscopo en la tibia izquierda?', '15')
-        #r_shank_rest = st.text_input('¿Qué columnas corresponden con el resto de componentes del sensor inercial en la tibia derecha?', '0,1,2,4,5')
-        #l_shank_rest = st.text_input('¿Qué columnas corresponden con el resto de componentes del sensor inercial en la tibia izquierda?', '12,13,14,16,17')
         right_TA = st.text_input('¿Qué columna corresponde con el tibial anterior de la pierna derecha?','31')
         left_TA = st.text_input('¿Qué columna corresponde con el tibial anterior de la pierna izquierda?', '38')
         right_VL = st.text_input('¿Qué columna corresponde con el vasto lateral de la pierna derecha?', '32')
@@ -92,16 +88,6 @@ def app():
         if submit_button_model:
             if len(dataframes) != 0 :
                 try:
-                    #list_emg_time = {'wa':wa,'var':var,'rms':rms,'mav':mav,'wfl':wfl,'zc':zc,'ssc':ssc, 'ssi':ssi }
-                    #list_emg_freq = {'mdf':mdf,'mf':mnf,'she':se,'spe':spe,'svde':svde}
-                    #list_imu = {'min':min_imu, 'max': max_imu,'std':std_imu, 'fin':final_imu, 'ini':init_imu,'mean': mean_imu}
-
-                    #r_imu_list = r_shank_rest.split(',')
-                    #r_imu_list = [int(i) for i in r_imu_list]
-
-                    #l_imu_list = l_shank_rest.split(',')
-                    #l_imu_list = [int(i) for i in l_imu_list]
-                    #emg_list = [int(i) for i in emg_list]
                     mode = int(mode)
                     r_gy = int(r_shank_gy)
                     l_gy = int(l_shank_gy)
@@ -115,7 +101,6 @@ def app():
                     r_lab_emg = [right_TA , right_VL]
                     l_lab_emg = [left_TA , left_VL]
                     emg_list= [right_TA , left_TA , right_VL, left_VL]
-                #name = pd.read_csv(df[0])
                     names = dataframes[0].columns
                     names_series = pd.Series(names)
 
@@ -125,14 +110,12 @@ def app():
                     n_emg_i = list(n_emg_i)
 
 
-                #gy = names[gy]
                     featurename_emg = ['mav','ssi','var', 'rms','wfl','zc' ,'ssc','wa' ,
                    'mdf','mf' ,'she', 'spe', 'svde']
 
                     featurename_imu = ['min', 'max', 'mean', 'std', 'initial', 'final']
 
 
-                    #gy = int(gy)
                     mode_lw = names[mode]
                     r_gy_ = names[r_gy]
                     st.write(r_gy_)
@@ -148,18 +131,13 @@ def app():
                     lab_emg = dgs.create_labels_emg(muscle_names, featurename_emg)
                     lab_emg_d = dgs.create_labels_emg(n_emg_d, featurename_emg)
                     lab_emg_i = dgs.create_labels_emg(n_emg_i, featurename_emg)
-                    #st.write(lab_emg)
                     imu_features = dgs.acc_features_step(acc_filt,r_gy_,l_gy_, acc_names, index_steps, r_lab, l_lab)
                     emg_features = dgs.emg_features_step(emg_filt, muscle_names, index_steps,
                                       acc_filt[r_gy_],
                                      acc_filt[l_gy_], r_lab_emg, l_lab_emg)
-                    #st.write(imu_features_s2s)
-                    #st.write(emg_features_s2s)
                     dataframe_imu_step = dgs.create_dataframe_step(imu_features, lab_imu, 0,r_lab, l_lab, r_lab_emg, l_lab_emg) # num_var = [len(imu_list),len(emg_list)]
-                    #st.write(imu_s2s_dataframe.head())
                     dataframe_emg_step = dgs.create_dataframe_step(emg_features, lab_emg, 1,r_lab, l_lab, lab_emg_d, lab_emg_i) #,num_var = [len(imu_list),len(emg_list)]
                     results = pd.concat([dataframe_imu_step,dataframe_emg_step],axis = 1)
-                    #st.write(results.head())
                     r_shank = results.loc[:,results.columns.str.startswith(r_gy_)]
                     r_shank = r_shank.reindex(sorted(r_shank), axis = 1)
 
@@ -178,7 +156,6 @@ def app():
 
                     lvl = results.loc[:,results.columns.str.startswith(names[left_VL])]
                     lvl = lvl.reindex(sorted(lvl), axis = 1)
-                    #st.write(lsol.head())
 
 
                     pdList_r = [r_shank, rta, rvl]
@@ -186,13 +163,9 @@ def app():
 
                     results_r = pd.concat(pdList_r,axis = 1)
                     results_l = pd.concat(pdList_l,axis = 1)
-                    #st.write(results_r)
-                    #st.write(results_l)
 
                     results_r = results_r.dropna(axis=0,how='all')
                     results_l = results_l.dropna(axis=0,how='all')
-                    #st.write(results_r)
-                    #st.write(results_l)
 
                     results_r = results_r.values
                     results_l = results_l.values
@@ -218,18 +191,11 @@ def app():
                     st.write(predict_df_l)
 
                     prediction = pd.concat([predict_df_r, predict_df_l], axis = 1)
-                #r= results.filter(regex= selected).columns
-                    #st.write(results)
                     if prediction is not None:
                             st.header('¡Aquí tienes tus datos procesados! :)')
-                            #st.markdown('This are the option you selected:' + str(submit_button))
                             download = download_link(prediction, 'datos_prediccion.csv', 'Pulsa aquí para descargar los datos')
 
                             st.markdown(download, unsafe_allow_html=True)
-                        #if st.button('Download Dataframe as CSV'):
-                         #   if uploaded_file is not None:
-                          #      download = download_link(results, 'YOUR_DF.csv', 'Click here to download data!')
-                           #     st.markdown(download, unsafe_allow_html=True)
                     else:
                         st.markdown('Algo ha ido mal :(')
                 except:

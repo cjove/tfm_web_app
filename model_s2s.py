@@ -91,13 +91,6 @@ def app():
         if submit_button_model:
             if len(dataframes) != 0 :
                 try:
-                    #list_emg_time = {'wa':wa,'var':var,'rms':rms,'mav':mav,'wfl':wfl,'zc':zc,'ssc':ssc, 'ssi':ssi }
-                    #list_emg_freq = {'mdf':mdf,'mf':mnf,'she':se,'spe':spe,'svde':svde}
-                    #list_imu = {'min':min_imu, 'max': max_imu,'std':std_imu, 'fin':final_imu, 'ini':init_imu,'mean': mean_imu}
-                    #imu_list = waist_rest.split(',')
-                    #emg_list = emg_cols.split(',')
-                    #imu_list = [int(i) for i in imu_list]
-                    #emg_list = [int(i) for i in emg_list]
                     waist = int(waist)
                     waist_az = int(waist_az)
                     right_TA = int(right_TA)
@@ -106,35 +99,26 @@ def app():
                     left_BF = int(left_BF)
                     imu_list = [waist_az, waist]
                     emg_list= [right_TA, left_TA, right_BF, left_BF]
-                #name = pd.read_csv(df[0])
                     names = dataframes[0].columns
-                #gy = names[gy]
                     featurename_emg = ['mav','ssi','var', 'rms','wfl','zc' ,'ssc','wa' ,
                    'mdf','mf' ,'she', 'spe', 'svde']
 
                     featurename_imu = ['min', 'max', 'mean', 'std', 'initial', 'final']
 
 
-                    #gy = int(gy)
                     gy = names[waist]
                     data = de.data_extraction(dataframes,names, emg_list, imu_list)
                     emg_filt = data[0]
                     acc_filt = data[1]
                     acc_names = data[2]
                     muscle_names = data[3]
-                    #st.write(muscle_names)
                     lab_imu = dgs.create_labels_imu(acc_names, featurename_imu)
                     lab_emg = dgs.create_labels_emg(muscle_names, featurename_emg)
-                    #st.write(lab_emg)
                     imu_features_s2s = dgs2s.acc_features_sit2stand(acc_filt, acc_names, gy)
                     emg_features_s2s = dgs2s.emg_features_sit2stand(emg_filt, muscle_names, acc_filt, gy)
-                    #st.write(imu_features_s2s)
-                    #st.write(emg_features_s2s)
                     imu_s2s_dataframe = dgs2s.create_dataframe_s2s(imu_features_s2s, lab_imu, 0) # num_var = [len(imu_list),len(emg_list)]
-                    #st.write(imu_s2s_dataframe.head())
                     emg_s2s_dataframe = dgs2s.create_dataframe_s2s(emg_features_s2s, lab_emg, 1) #,num_var = [len(imu_list),len(emg_list)]
                     results = pd.concat([imu_s2s_dataframe,emg_s2s_dataframe],axis = 1)
-                    #st.write(results.head())
                     waz_mean = results.loc[:,results.columns.str.startswith(str(names[waist_az])+'_mean')]
                     wgx_std = results.loc[:,results.columns.str.startswith(str(names[waist])+'_std')]
                     rta_ssc = results.loc[:,results.columns.str.startswith(str(names[right_TA])+'_ssc')]
@@ -156,8 +140,6 @@ def app():
                     pdList_l = [waz_mean,wgx_std,lta_ssc,lta_svde,lbf_mav,lbf_rms,lbf_ssi,lbf_svde,lbf_wfl]
                     results_r = pd.concat(pdList_r,axis = 1)
                     results_l = pd.concat(pdList_l,axis = 1)
-                    #st.write(results_r)
-                    #st.write(results_l)
                     results_r = results_r.values
                     results_l = results_l.values
 
@@ -182,18 +164,11 @@ def app():
                     st.write(predict_df_l)
 
                     prediction = pd.concat([predict_df_r, predict_df_l], axis = 1)
-                #r= results.filter(regex= selected).columns
-                    #st.write(results)
                     if prediction is not None:
                             st.header('¡Aquí tienes tus datos procesados! :)')
-                            #st.markdown('This are the option you selected:' + str(submit_button))
                             download = download_link(prediction, 'datos_prediccion.csv', 'Pulsa aquí para descargar los datos')
 
                             st.markdown(download, unsafe_allow_html=True)
-                        #if st.button('Download Dataframe as CSV'):
-                         #   if uploaded_file is not None:
-                          #      download = download_link(results, 'YOUR_DF.csv', 'Click here to download data!')
-                           #     st.markdown(download, unsafe_allow_html=True)
                     else:
                         st.markdown('Algo ha ido mal :(')
                 except:

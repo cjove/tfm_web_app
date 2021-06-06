@@ -119,10 +119,6 @@ def app():
         r_labels_emg = cols.text_input('¿Qué columnas pertenecen a los músculos del lado derecho?', '30,31,32,33,34,35,36')
         l_labels_emg = cols.text_input('¿Qué columnas pertenecen a los músculos del lado izquierdo?','37,38,39,40,41,42,43')
         mode = cols.text_input('¿Qué columna pertenece al modo?','48')
-        #emg_fs = cols.selectbox('What´s the sampling frequency of your sEMG sensor', options= [250,512,1024,2048], index = 2)
-        #imu_fs = cols.selectbox('What´s the sampling frequency of your IMU sensor', options= [250,512,1024,2048], index = 2)
-        #emg_cols = cols.text_input('Which columns of your dataset correspond to sEMG data?', '30,31,32,33,34,35,36,37,38,39,40,41,42,43')
-        #imu_cols = cols.text_input('Which columns of your dataset correspond to IMU data?', '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29')
 
         submit_button = st.form_submit_button(label='Submit')
 
@@ -133,14 +129,10 @@ def app():
                     list_emg_freq = {'mdf':mdf,'mf':mnf,'she':se,'spe':spe,'svde':svde}
                     list_imu = {'min':min_imu, 'max': max_imu,'std':std_imu, 'fin':final_imu, 'ini':init_imu,'mean': mean_imu}
                     emg_cols = r_labels_emg +','+ l_labels_emg
-                    #st.write(emg_cols)
                     imu_cols = r_labels +','+ l_labels
 
-                    #st.write(len(emg_list))
-                #name = pd.read_csv(df[0])
                     names = dataframes[0].columns
                     names_series = pd.Series(names)
-                #gy = names[gy]
                     featurename_emg = ['mav','ssi','var', 'rms','wfl','zc' ,'ssc','wa' ,
                    'mdf','mf' ,'she', 'spe', 'svde']
 
@@ -157,22 +149,16 @@ def app():
                     l_lab = [int(i) for i in l_lab]
                     r_lab.append(gy_list[0])
                     l_lab.append(gy_list[1])
-                    #n_emg_d = names_series[r_lab_emg]
-                    #n_emg_i = names_series[l_lab_emg]
 
 
                     r_lab_emg = r_labels_emg.split(',')
                     l_lab_emg = l_labels_emg.split(',')
                     r_lab_emg = [int(i) for i in r_lab_emg]
-                    #st.write(len(r_lab_emg))
-                    #st.write(len(l_lab_emg))
                     l_lab_emg = [int(i) for i in l_lab_emg]
                     n_emg_d = names_series[r_lab_emg]
                     n_emg_i = names_series[l_lab_emg]
                     n_emg_d = list(n_emg_d)
                     n_emg_i = list(n_emg_i)
-                    #st.write(n_emg_d)
-                    #st.write(n_emg_i)
                     imu_list = imu_cols.split(',')
                     emg_list = emg_cols.split(',')
                     imu_list = [int(i) for i in imu_list]
@@ -193,14 +179,10 @@ def app():
                                      acc_filt[left_shank], r_lab_emg, l_lab_emg)
 
 
-                    #lab_imu = dgs.create_labels_imu(acc_names, dgs.featurename_imu )
-                    #lab_emg = dgs.create_labels_emg(muscle_names, dgs.featurename_emg)
                     lab_imu = dgs.create_labels_imu(acc_names, featurename_imu)
                     lab_emg = dgs.create_labels_emg(muscle_names, featurename_emg)
                     lab_emg_d = dgs.create_labels_emg(n_emg_d, featurename_emg)
                     lab_emg_i = dgs.create_labels_emg(n_emg_i, featurename_emg)
-                    #st.write(lab_emg_d)
-                    #st.write(lab_emg_i)
 
 
 
@@ -216,17 +198,11 @@ def app():
                     for i in selected:
                         results=results[results.columns.drop(list(results.filter(regex= i)))]
 
-                    #r= results.filter(regex= selected).columns
                     st.write(results)
                     if results is not None:
                             st.header('¡Aquí tienes tus datos procesados! :)')
-                            #st.markdown('This are the option you selected:' + str(submit_button))
                             download = download_link(results, 'datos_procesados.csv', 'Pulsa aquí para descargar los datos')
                             st.markdown(download, unsafe_allow_html=True)
-                        #if st.button('Download Dataframe as CSV'):
-                         #   if uploaded_file is not None:
-                          #      download = download_link(results, 'YOUR_DF.csv', 'Click here to download data!')
-                           #     st.markdown(download, unsafe_allow_html=True)
                     else:
                         st.markdown('Algo ha ido mal :(')
 
