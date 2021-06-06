@@ -11,7 +11,7 @@ st.markdown("""
 Esta aplicación web es el resultado del trabajo de final de Máster de la titulación "Máster en Bioestadísctica y Bioinformática" UOC-UB.
 En ella podrás introducir tus datos recogidos durante la marcha en superficie plana o la transición de sedestación a bipedestación, escoger las variables que sean de tu interés y obtendrás el valor de la dichas variables de cada ciclo de la marcha o de cada transición.
 También podrás introducir tus datos para predecir la actividad electrica de aquellos músculos que no has podido registrar.
-Accede a cada uno de los apartados de la aplicación para obtener información más detalladas.
+Accede a cada uno de los apartados de la aplicación para obtener información más detallada.
 
 """)
 

@@ -57,16 +57,15 @@ def app():
 
     with header:
         st.title("Predicción de la actividad neuromuscular durante la transición de sedestación a bipedestación ")
-        st.markdown('En esta sección de la aplicación, introduciendo en el formulario las columnas provenientes del componente Z del acelerómetro de la cadera, el componente X del giróscopo de la cadera y la actividad electromiográfica del tibial anterior y del bíceps femoral podrás predecir la actividad muscular (RMS o media cuadrática) de los siguientes 5 músculos: gemelo interno (GI), sóleo (SOL), semitendinoso (ST), vasto lateral (VL) y recto femoral (RF) durante la transición de sedestación a bipedestación de ambas piernas')
-        st.markdown('El algoritmo utilizado es Árboles Extra con los siguientes parámetros: bootstrap = False, criterion = mae, max_depth = 10, min_samples_leaf = 1, min_samples_split = 5, n_estimators = 300')
-        st.markdown('Esta aplicación asume que se han realizado registros bilaterales y que el primer movimiento registrado es la transición y que no existe en el registro movimientos con mayor velocidad angular de la cintura')
+        st.markdown('En esta sección de la aplicación, introduciendo en el formulario las columnas provenientes del componente Z del acelerómetro de la cadera, el componente X del giróscopo de la cadera y la actividad electromiográfica del tibial anterior y del bíceps femoral podrás predecir la actividad muscular (RMS o media cuadrática) de los siguientes 5 músculos: gemelo interno (GI), sóleo (SOL), semitendinoso (ST), vasto lateral (VL) y recto femoral (RF) durante la transición de sedestación a bipedestación')
+        st.markdown('El algoritmo utilizado es Árboles extremadamente aleatorios con los siguientes parámetros: bootstrap = False, criterion = mae, max_depth = 10, min_samples_leaf = 1, min_samples_split = 5, n_estimators = 300')
+        st.markdown('Esta aplicación asume que se han realizado registros bilaterales y que el primer movimiento registrado es la transición y que no existe en el registro movimientos con mayor velocidad angular de la cintura.')
 
 
     with dataset:
 
         st.header('Paso 1.')
-        uploaded_file =st.file_uploader('Introduce aquí tu matriz de datos', type = ['csv'],
-                         accept_multiple_files=False)
+        uploaded_file =st.file_uploader('Introduce aquí tu matriz de datos. Se aceptan múltiples archivos.', type = ['csv'], accept_multiple_files=True)
         if uploaded_file is not None:
             dataframes = []
             for i in uploaded_file:
@@ -77,10 +76,9 @@ def app():
 
     with model_application:
         st.header('Paso 2. Indica a continuación qué columna pertenece a cada uno de los siguientes apartados')
-        st.markdown('Recuerda: este modelo requiere que hayas recogido información de un sensor inercial en la cintura y .....')
 
-        waist = st.text_input('¿Qué columna corresponde con el componente X del giróscopo en la cintura', '29')
-        waist_az = st.text_input('¿Qué columna corresponde con el componente Z del acelerómetro en la cintura', '26')
+        waist = st.text_input('¿Qué columna corresponde con el componente X del giróscopo en la cintura?', '29')
+        waist_az = st.text_input('¿Qué columna corresponde con el componente Z del acelerómetro en la cintura?', '26')
         right_TA = st.text_input('¿Qué columna corresponde con el registro del tibal anterior derecho?', '30')
         left_TA = st.text_input('¿Qué columna corresponde con el registro del tibal anterior izquierdo?', '37')
         right_BF = st.text_input('¿Qué columna corresponde con el registro del bíceps femoral derecho?', '33')

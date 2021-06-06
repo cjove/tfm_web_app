@@ -57,25 +57,25 @@ def app():
 
     with header:
         st.title('Predicción de la actividad neuromuscular durante la marcha en superficie plana ')
-        st.markdown('En esta sección de la aplicación, introduciendo en el formulario las columnas provenientes del componente X del giróscopo ubicado en la tibia, la actividad electromiográfica de los tibiales anteriores y de los vastos laterales podrás predecir la actividad muscular (RMS o media cuadrática) de los siguientes 5 músculos: gemelo interno (GI), sóleo (SOL), bíceps femoral (BF), semitendinoso (ST) y recto femoral (RF) de ambas piernas')
-        st.markdown('El algoritmo utilizado es Árboles Extra con los siguientes parámetros: bootstrap = False, criterion = mse, max_depth = 90, min_samples_leaf = 1, min_samples_split = 5, n_estimators = 250')
-        st.markdown('Para poder utilizar correctamente la aplicación es necesaria tener una columna en la matriz de datos que indique el movimiento que se esta relizando (columna "Modo").La columna modo es necesaria para garantizar que si se han realizado otras actividades distintas a la marcha en el registro introducido se discriminan los pasos correctamente. Para ello crea una columna con nombre "mode" y rellena con 1´s cada punto de la señal que correspoda a la marcha en superficie plana. Si todo el registro es de marcha en plano, rellena la columna de 1´s en su totalidad')
+        st.markdown('En esta sección de la aplicación, introduciendo en el formulario las columnas provenientes del componente Y del giróscopo ubicado en la tibia, la actividad electromiográfica de los tibiales anteriores y de los vastos laterales podrás predecir la actividad muscular (RMS o media cuadrática) de los siguientes 5 músculos: gemelo interno (GI), sóleo (SOL), bíceps femoral (BF), semitendinoso (ST) y recto femoral (RF) de ambas piernas')
+        st.markdown('El algoritmo utilizado es Árboles extremadamente aleatorios con los siguientes parámetros: bootstrap = False, criterion = mse, max_depth = 90, min_samples_leaf = 1, min_samples_split = 5, n_estimators = 250.')
+        st.markdown('Para poder utilizar correctamente la aplicación es necesario tener una columna en la matriz de datos que indique el movimiento que se esta relizando (columna "Modo").La columna modo es necesaria para garantizar que si se han realizado otras actividades distintas a la marcha en el registro introducido se discriminan los pasos correctamente. Para ello crea una columna con nombre "mode" y rellena con 1´s cada punto de la señal que correspoda a la marcha en superficie plana. Si todo el registro es de marcha en plano, rellena la columna de 1´s en su totalidad.')
 
     with dataset:
 
         st.header('Paso 1.')
-        uploaded_file =st.file_uploader('Introduce aquí tu matriz de datos', type = ['csv'],
+        uploaded_file =st.file_uploader('Introduce aquí tu matriz de datos. Sólo se acepta un archivo por ejecución.', type = ['csv'],
                          accept_multiple_files=False)
+        dataframes = []
         if uploaded_file is not None:
             dataframes = []
-            for i in uploaded_file:
-                df = pd.read_csv(i)
-                dataframes.append(df)
-                st.write(df.head())
+
+            df = pd.read_csv(uploaded_file)
+            dataframes.append(df)
+            st.write(df.head())
 
     with model_application:
         st.header('Paso 2. Indica a continuación qué columna pertenece a cada uno de los siguientes apartados')
-        st.markdown('Recuerda: este modelo requiere que hayas recogido información de sensores inerciales en las tibias y .....')
         r_shank_gy = st.text_input('¿Qué columna corresponde con el componente Y del giróscopo en la tibia derecha?', '3')
         l_shank_gy = st.text_input('¿Qué columna corresponde con el componente Y del giróscopo en la tibia izquierda?', '15')
         right_TA = st.text_input('¿Qué columna corresponde con el tibial anterior de la pierna derecha?','31')
@@ -118,7 +118,7 @@ def app():
 
                     mode_lw = names[mode]
                     r_gy_ = names[r_gy]
-                    st.write(r_gy_)
+
                     l_gy_ = names[l_gy]
                     data = de.data_extraction_step(dataframes,names, emg_list, imu_list, mode_lw )
                     emg_filt = data[0]
@@ -126,7 +126,7 @@ def app():
                     acc_names = data[2]
                     muscle_names = data[3]
                     index_steps = data[4]
-                    st.write(acc_names)
+
                     lab_imu = dgs.create_labels_imu(acc_names, featurename_imu)
                     lab_emg = dgs.create_labels_emg(muscle_names, featurename_emg)
                     lab_emg_d = dgs.create_labels_emg(n_emg_d, featurename_emg)

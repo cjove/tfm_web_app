@@ -18,8 +18,7 @@ import pickle
 
 from typing import Dict
 def app():
-    pickle_in = open('multioutput_regression_step.pkl', 'rb')
-    regressor = pickle.load(pickle_in)
+
 
     header = st.beta_container()
     dataset = st.beta_container()
@@ -58,27 +57,27 @@ def app():
 
     with header:
         st.title('Extracción de variables durante la marcha en superficie plana')
-        st.markdown('Escoge aquellas variables que sean de tu interés e indica a que hemicuerpo y tipo de sensor corresponden las columnas de tu matriz de datos. Es fundamental que indiques correctamente que columna corresponde al componente Y del giróscopo de la tibia derecha e izquierda.')
+        st.markdown('Escoge aquellas variables que sean de tu interés e indica a qué hemicuerpo y tipo de sensor corresponden las columnas de tu matriz de datos. Es fundamental que indiques correctamente que columna corresponde al componente Y del giróscopo de la tibia derecha e izquierda.')
         st.markdown('Esta aplicación asume que se han realizado registros bilaterales y que al menos se han recogido el componente Y del giróscopo de cada tibia y algun músculos bilateralmente para poder ser utilizada.')
 
         st.markdown("""
         El procedimiento interno de la aplicación es:
         * Detección de las zancadas en cada pierna
         * Cálculo de las variables para cada zancada
-        * Cada fila del csv descargable representa las variables obtenidas en una zancada. Se presentan de forma conjunta los resultados del lado derecho e izquierdo.
+        * Cada fila del csv descargable representa un paso y cada columna una variable obtenida en la zancada. Se presentan de forma conjunta los resultados del lado derecho e izquierdo.
         """)
-        st.markdown('Para poder utilizar correctamente la aplicación es necesaria tener una columna en la matriz de datos que indique el movimiento que se esta relizando (columna "Modo").La columna modo es necesaria para garantizar que si se han realizado otras actividades distintas a la marcha en el registro introducido se discriminan los pasos correctamente. Para ello crea una columna con nombre "mode" y rellena con 1´s cada punto de la señal que correspoda a la marcha en superficie plana. Si todo el registro es de marcha en plano, rellena la columna de 1´s en su totalidad')
+        st.markdown('Para poder utilizar correctamente la aplicación es necesaria tener una columna en la matriz de datos que indique el movimiento que se esta relizando (columna "Modo").La columna modo es necesaria para garantizar que si se han realizado otras actividades distintas a la marcha en el registro introducido se discriminan los pasos correctamente. Para ello crea una columna con nombre "mode" y rellena con 1´s cada punto de la señal que corresponda a la marcha en superficie plana. Si todo el registro es de marcha en plano, rellena la columna de 1´s en su totalidad')
 
     with dataset:
         st.header('Paso 1.')
-        uploaded_file =st.file_uploader('Introduce aquí tu matriz de datos', type = ['csv'],
+        uploaded_file =st.file_uploader('Introduce aquí tu matriz de datos. Sólo se acepta un archivo por ejecución.', type = ['csv'],
                          accept_multiple_files=False)
+        dataframes = []
         if uploaded_file is not None:
-            dataframes = []
-            for i in uploaded_file:
-                df = pd.read_csv(i)
-                dataframes.append(df)
-                st.write(df.head())
+
+            df = pd.read_csv(uploaded_file)
+            dataframes.append(df)
+            st.write(df.head())
 
     with form :
         st.header('Paso 2. Selecciona las variables de interés')
@@ -123,7 +122,7 @@ def app():
         submit_button = st.form_submit_button(label='Submit')
 
         if submit_button:
-            if len(dataframes) != 0 :
+            if len(dataframes) != 0:
                 try:
                     list_emg_time = {'wa':wa,'var':var,'rms':rms,'mav':mav,'wfl':wfl,'zc':zc,'ssc':ssc, 'ssi':ssi }
                     list_emg_freq = {'mdf':mdf,'mf':mnf,'she':se,'spe':spe,'svde':svde}

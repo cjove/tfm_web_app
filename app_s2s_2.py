@@ -17,8 +17,7 @@ import pickle
 from typing import Dict
 
 def app():
-    pickle_in = open('multioutput_regression_s2s_2.pkl', 'rb')
-    regressor = pickle.load(pickle_in)
+
 
     header = st.beta_container()
     dataset = st.beta_container()
@@ -63,18 +62,18 @@ def app():
         st.markdown("""
         El procedimiento interno de la aplicación es:
         * Detección de la transción de sedestación a bipedestación
-        * Cálculo de las variables para cada transición
-        * Cada fila del csv descargable representa las variables obtenidas en un levantamiento. Se presentan de forma conjunta los resultados del lado derecho e izquierdo.
+        * Cálculo de las variables para la transición
+        * Cada columna del csv descargable representa una variable obtenida en la transición. Se presentan de forma conjunta los resultados del lado derecho e izquierdo.
         """)
 
 
     with dataset:
 
         st.header('Paso 1.')
-        uploaded_file =st.file_uploader('Introduce aquí tu matriz de datos', type = ['csv'],
-                         accept_multiple_files=False)
+        uploaded_file =st.file_uploader('Introduce aquí tu matriz de datos. Se aceptan múltiples archivos.', type = ['csv'], accept_multiple_files=True)
+        dataframes = []
         if uploaded_file is not None:
-            dataframes = []
+
             for i in uploaded_file:
                 df = pd.read_csv(i)
                 dataframes.append(df)
@@ -169,7 +168,7 @@ def app():
                     st.write(results)
                     if results is not None:
                             st.header('¡Aquí tienes tus datos procesados! :)')
-                            st.markdown('This are the option you selected:' + str(submit_button))
+                            #st.markdown('This are the option you selected:' + str(submit_button))
                             download = download_link(results, 'datos_procesados.csv', 'Pulsa aquí para descargar los datos')
                             st.markdown(download, unsafe_allow_html=True)
                     else:
