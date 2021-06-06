@@ -1,4 +1,7 @@
 # tfm_web_app
+En este repositorio se encuentra todo el código desarrollado para la implementación a través de Streamlit resultante del trabajo final del Master de Bioestadistica y Bioinformatica UOC-UB realizado por Carlos Jove.
+
+Se puede acceder a la aplicación en el siguiente enlace: https://share.streamlit.io/cjove/tfm_web_app/main/app.py. 
 
 Contenido del repositorio de la aplicación web.
 
