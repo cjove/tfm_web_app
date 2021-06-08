@@ -112,7 +112,7 @@ def app():
         st.markdown('Introduce el valor numérico al que pertenece tu columna, siendo la primera 0. Separa los elementos por "," siguiendo el ejemplo de los valores que aparecen por defecto.')
 
         emg_cols = st.text_input('¿Qué columnas pertenecen a los sensores de electromiografía?', '30,31,32,33,34,35,36,37,38,39,40,41,42,43')
-        imu_cols = st.text_input('¿Qué columnas pertenecen a los sensores inerciales?', '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29')
+        imu_cols = st.text_input('¿Qué columnas pertenecen a los sensores inerciales?', '1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28')
         gy = st.text_input('¿Qué columna pertene al componente X de la cintura?', '29')
 
         submit_button = st.form_submit_button(label='Submit')
@@ -143,8 +143,11 @@ def app():
                     filtered_imu = [k for k, v in list_imu.items() if v is False]
                     selected = filtered_emg_time + filtered_emg_freq + filtered_imu
 
+
                     gy = int(gy)
+                    imu_list.append(gy)
                     gy = names[gy]
+
                     data = de.data_extraction(dataframes,names, emg_list, imu_list)
                     emg_filt = data[0]
                     acc_filt = data[1]
